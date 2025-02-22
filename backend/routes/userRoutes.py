@@ -4,10 +4,12 @@ from backend.schemas.userSchema import UserCreate, UserResponse
 from backend.services.userServices import UserServices
 from backend.database.database import SessionLocal
 from backend.models.userModel import User
-
+from backend.utils.hash import verify_password
+from backend.utils.token import create_access_token
+from backend.schemas.userSchema import LoginRequest
+ 
 router = APIRouter()
 
-# Dependency to get the database session
 def get_db():
     db = SessionLocal()
     try:
@@ -17,10 +19,21 @@ def get_db():
 
 @router.post("/signup", response_model=UserResponse)
 def signup(user: UserCreate, db: Session = Depends(get_db)):
-    # Check if email already exists
     existing_user = UserServices.get_user_by_email(db, user.email)
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
     new_user = UserServices.create_user(db, user)
     return new_user
+
+@router.post("/login")
+def login(user: LoginRequest, db: Session = Depends(get_db)):
+    """Authenticate user and return JWT token."""
+    db_user = db.query(User).filter(User.email == user.email).first()
+    
+    if not db_user or not verify_password(user.password, db_user.password):
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+
+    access_token = create_access_token(data={"sub": str(db_user.id)})
+    
+    return {"access_token": access_token, "token_type": "bearer"}

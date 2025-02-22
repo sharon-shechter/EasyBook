@@ -1,6 +1,11 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 import datetime
+from pydantic import BaseModel, EmailStr
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
 
 class UserCreate(BaseModel):
     admin: bool 
