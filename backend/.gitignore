@@ -1,2 +1,4 @@
-# Ignore the env directory
 venv/
+pycash/
+database/
+**/__pycache__/
