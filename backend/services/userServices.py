@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from backend.models.userModel import User
 from backend.schemas.userSchema import UserCreate
-from backend.utils.hash import hash_password
+from backend.utilities.hash import hash_password
 
 class UserServices:
     @staticmethod

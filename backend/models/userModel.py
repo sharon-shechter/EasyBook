@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy.orm import relationship
 import datetime
 from backend.database.database import Base
 
@@ -14,3 +15,5 @@ class User(Base):
     phone_number = Column(String, nullable=True)
     address = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+    lessons = relationship("Lesson", back_populates="user")
