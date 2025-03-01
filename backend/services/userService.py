@@ -3,7 +3,7 @@ from backend.models.userModel import User
 from backend.schemas.userSchema import UserCreate
 from backend.utilities.hash import hash_password
 
-class UserServices:
+class UserService:
     @staticmethod
     def create_user(db: Session, user: UserCreate):
         """Create a new user and store hashed password."""
