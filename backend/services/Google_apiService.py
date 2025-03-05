@@ -38,15 +38,15 @@ def authenticate_google_calendar():
     
 
 
-def get_events_of_date(service, lesson_data : LessonCreate):
+def get_events_of_date(service, date):
     """
     Get all events for a given date from the authenticated Google Calendar.
     """
     try:
         tz = pytz.timezone("Asia/Jerusalem") 
 
-        start_of_day = tz.localize(datetime.combine(lesson_data.date, datetime.min.time())).isoformat()
-        end_of_day = tz.localize(datetime.combine(lesson_data.date, datetime.max.time())).isoformat()
+        start_of_day = tz.localize(datetime.combine(date, datetime.min.time())).isoformat()
+        end_of_day = tz.localize(datetime.combine(date, datetime.max.time())).isoformat()
 
         events_result = service.events().list(
             calendarId="primary",
@@ -61,6 +61,7 @@ def get_events_of_date(service, lesson_data : LessonCreate):
 
     except Exception as e:
         raise Exception(f"Failed to retrieve events: {str(e)}")
+    
 
 
 def is_time_slot_available(events, start_time, end_time):
@@ -102,7 +103,6 @@ def calculate_travel_time(origin, destination, departure_time):
     """
     Calculate the estimated travel time from origin to destination at a specific departure time.
     """
-    print("Calculating travel time...")
     try:
         gmaps = googlemaps.Client(key=Google_API_KEY)
         
@@ -138,8 +138,6 @@ def calculate_departure_time(origin, destination, arrival_time):
         gmaps = googlemaps.Client(key=Google_API_KEY)
 
         # Request directions with arrival_time
-        print(f"Origin: {origin}, Destination: {destination}")
-        print(f"Arrival Time (Unix Timestamp): {arrival_time_unix}")
 
         try:
                 directions = gmaps.directions(

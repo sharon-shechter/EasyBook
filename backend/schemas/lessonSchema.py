@@ -7,8 +7,8 @@ class LessonCreate(BaseModel):
     start_time: time
     end_time: time
     duration: int  
-    location: str
-    adress: str
+    lesson_type: str
+    lesson_adress: str
     status: int  
     lesson_name: str
     class_number: int
@@ -21,8 +21,8 @@ class LessonResponse(BaseModel):
     date: date  
     start_time: time
     end_time: time
-    location: str
-    adress: str
+    lesson_type : str
+    lesson_adress: str
     status: int
     lesson_name: str
     class_number: int

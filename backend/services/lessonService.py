@@ -17,8 +17,8 @@ def create_lesson(db: Session, lesson_data: LessonCreate, user_id: int):
             date=lesson_data.date,
             start_time=lesson_data.start_time,
             end_time=lesson_data.end_time,
-            location=lesson_data.location,
-            adress=lesson_data.adress,  # Make sure it's not causing issues
+            lesson_type =lesson_data.lesson_type ,
+            lesson_adress=lesson_data.lesson_adress, 
             status=lesson_data.status,
             lesson_name=lesson_data.lesson_name,
             class_number=lesson_data.class_number,
@@ -36,8 +36,8 @@ def create_lesson(db: Session, lesson_data: LessonCreate, user_id: int):
             date=new_lesson.date,  
             start_time=new_lesson.start_time,
             end_time=new_lesson.end_time,
-            location=new_lesson.location,
-            adress=new_lesson.adress,
+            lesson_type =new_lesson.lesson_type ,
+            lesson_adress=new_lesson.lesson_adress ,
             status=new_lesson.status,
             lesson_name=new_lesson.lesson_name,
             class_number=new_lesson.class_number,
@@ -55,16 +55,14 @@ def round_to_nearest_five(dt):
     """Round datetime to the nearest 5-minute mark."""
     minute = (dt.minute // 5) * 5
     rounded_dt = dt.replace(minute=minute, second=0, microsecond=0)
-    
     if dt.minute % 5 >= 3:
         rounded_dt += timedelta(minutes=5)
 
     return rounded_dt
 
 
-def get_possible_time_slots(lesson_data: LessonCreate, events):
+def get_possible_time_slots_for_home_lesson( lesson_adress, lesson_duration, events):
     """ Identify available time slots for a new lesson by analyzing existing calendar events and travel time constraints. """
-    print("Finding possible time slots...")
     possible_slots = []
     tz = pytz.timezone("Asia/Jerusalem")
 
@@ -85,11 +83,11 @@ def get_possible_time_slots(lesson_data: LessonCreate, events):
             try:
                 # ---------------- BEFORE EVENT ----------------
                 lesson_departure_time = calculate_departure_time(
-                    lesson_data.adress, event_location, event_start_time
+                    lesson_adress, event_location, event_start_time
                 )
 
                 lesson_end_before_event = round_to_nearest_five(parse(lesson_departure_time) - timedelta(minutes=EXTRA_TIME))
-                lesson_start_before_event = round_to_nearest_five (lesson_end_before_event - timedelta(minutes=lesson_data.duration))
+                lesson_start_before_event = round_to_nearest_five (lesson_end_before_event - timedelta(minutes=lesson_duration))
 
                 if is_time_slot_available(events, lesson_start_before_event, lesson_end_before_event):
                     possible_slots.append((lesson_start_before_event, lesson_end_before_event))
@@ -100,11 +98,11 @@ def get_possible_time_slots(lesson_data: LessonCreate, events):
             try:
                 # ---------------- AFTER EVENT ----------------
                 travel_duration_minutes = calculate_travel_time(
-                    event_location, lesson_data.adress, event_end_time
+                    event_location, lesson_adress, event_end_time
                 )
 
                 lesson_start_after_event = round_to_nearest_five (event_end_time + timedelta(minutes=travel_duration_minutes + EXTRA_TIME))
-                lesson_end_after_event = round_to_nearest_five(lesson_start_after_event + timedelta(minutes=lesson_data.duration))
+                lesson_end_after_event = round_to_nearest_five(lesson_start_after_event + timedelta(minutes=lesson_duration))
 
                 if is_time_slot_available(events, lesson_start_after_event, lesson_end_after_event):
                     possible_slots.append((lesson_start_after_event, lesson_end_after_event))
