@@ -50,6 +50,16 @@ def create_lesson(db: Session, lesson_data: LessonCreate, user_id: int):
             status_code=500,
             content={"status": "error", "message": f"Failed to create lesson: {str(e)}"}
         )
+    
+def round_to_nearest_five(dt):
+    """Round datetime to the nearest 5-minute mark."""
+    minute = (dt.minute // 5) * 5
+    rounded_dt = dt.replace(minute=minute, second=0, microsecond=0)
+    
+    if dt.minute % 5 >= 3:
+        rounded_dt += timedelta(minutes=5)
+
+    return rounded_dt
 
 
 def get_possible_time_slots(lesson_data: LessonCreate, events):
@@ -69,7 +79,7 @@ def get_possible_time_slots(lesson_data: LessonCreate, events):
             event_end_time = datetime.fromisoformat(event_end_iso).astimezone(tz)
 
         except Exception as e:
-           raise Exception(f"Error parsing event data: {str(e)}")
+            raise Exception(f"Error parsing event data: {str(e)}")
         
         if event_location:
             try:
@@ -78,8 +88,8 @@ def get_possible_time_slots(lesson_data: LessonCreate, events):
                     lesson_data.adress, event_location, event_start_time
                 )
 
-                lesson_end_before_event = parse(lesson_departure_time) - timedelta(minutes=EXTRA_TIME)
-                lesson_start_before_event = lesson_end_before_event - timedelta(minutes=lesson_data.duration)
+                lesson_end_before_event = round_to_nearest_five(parse(lesson_departure_time) - timedelta(minutes=EXTRA_TIME))
+                lesson_start_before_event = round_to_nearest_five (lesson_end_before_event - timedelta(minutes=lesson_data.duration))
 
                 if is_time_slot_available(events, lesson_start_before_event, lesson_end_before_event):
                     possible_slots.append((lesson_start_before_event, lesson_end_before_event))
@@ -93,14 +103,13 @@ def get_possible_time_slots(lesson_data: LessonCreate, events):
                     event_location, lesson_data.adress, event_end_time
                 )
 
-                lesson_start_after_event = event_end_time + timedelta(minutes=travel_duration_minutes + EXTRA_TIME)
-                lesson_end_after_event = lesson_start_after_event + timedelta(minutes=lesson_data.duration)
+                lesson_start_after_event = round_to_nearest_five (event_end_time + timedelta(minutes=travel_duration_minutes + EXTRA_TIME))
+                lesson_end_after_event = round_to_nearest_five(lesson_start_after_event + timedelta(minutes=lesson_data.duration))
 
                 if is_time_slot_available(events, lesson_start_after_event, lesson_end_after_event):
                     possible_slots.append((lesson_start_after_event, lesson_end_after_event))
 
             except Exception as e:
-                print(f"Error: {str(e)}")
-                continue  # Skip this and move to the next event
+                raise Exception(f"Error: {str(e)}")
 
     return possible_slots
