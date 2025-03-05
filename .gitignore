@@ -1,5 +1,4 @@
 config.py
 __pycache__/config.cpython-312.pyc
 .env
-credentials.json
-token.json
+

@@ -1,37 +1,33 @@
 from pydantic import BaseModel
-from datetime import datetime
-from typing import Optional
+from datetime import time, date, datetime
 
-# Define status values as integers
-PENDING = 0
-CONFIRMED = 1
-COMPLETED = 2
-
-# Lesson Creation Schema
+# Lesson Create Schema
 class LessonCreate(BaseModel):
-    start_time: datetime
-    end_time: datetime
-    location: str  # "Zoom" or "Home"
-    status: Optional[int] = PENDING  # Status as an integer
+    date: date  
+    start_time: time
+    end_time: time
+    duration: int  
+    location: str
+    adress: str
+    status: int  
     lesson_name: str
     class_number: int
 
+
 # Lesson Response Schema
 class LessonResponse(BaseModel):
-    id: int
+    lesson_id: int  
     user_id: int
-    start_time: datetime
-    end_time: datetime
+    date: date  
+    start_time: time
+    end_time: time
     location: str
-    status: int  
+    adress: str
+    status: int
     lesson_name: str
     class_number: int
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
-
-
-
-
+class Config:
+    from_attributes = True
