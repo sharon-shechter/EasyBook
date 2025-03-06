@@ -3,12 +3,10 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
+from datetime import time
 import googlemaps
 import pytz
-from dateutil.parser import parse
-from backend.schemas.lessonSchema import LessonCreate
 from config import token, credentials, Google_API_KEY
-EXTRA_TIME = 30 
 
 
 
@@ -62,12 +60,31 @@ def get_events_of_date(service, date):
     except Exception as e:
         raise Exception(f"Failed to retrieve events: {str(e)}")
     
+def is_reasonable_time_slot(start_time, end_time):
+    """Make sure the time slot is reasonable"""
 
+    earliest_time = time(8, 0)  
+    latest_time = time(21, 0)  
+
+    # Extract time portion from datetime
+    start_time_hour = start_time.time()
+    end_time_hours = end_time.time()
+
+    if start_time_hour < earliest_time or start_time_hour > latest_time:
+        return False
+    if end_time_hours > latest_time:
+        return False
+    return True
 
 def is_time_slot_available(events, start_time, end_time):
     """
     Check if a given time slot is available.
     """
+    try: 
+        if not is_reasonable_time_slot(start_time, end_time):
+            return False
+    except Exception as e:
+        raise Exception(f"Error checking time slot resenoable: {str(e)}")
     if not events:
         return True  
 

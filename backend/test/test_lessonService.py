@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, date
 from backend.services.lessonService import (
     create_lesson,
     round_to_nearest_five,
-    get_possible_time_slots_for_home_lesson
+    get_possible_time_slots
 )
 from backend.models.lessonModel import Lesson
 from backend.schemas.lessonSchema import LessonCreate, LessonResponse
@@ -92,7 +92,7 @@ def test_get_possible_time_slots(sample_events):
                return_value=(datetime.now(tz) - timedelta(minutes=30)).isoformat()):
         with patch("backend.services.Google_apiService.calculate_travel_time", return_value=30):
             with patch("backend.services.Google_apiService.is_time_slot_available", return_value=True):
-                slots = get_possible_time_slots_for_home_lesson(lesson_date, lesson_address, lesson_duration, sample_events)
+                slots = get_possible_time_slots(lesson_date, lesson_address, lesson_duration, sample_events)
 
     assert isinstance(slots, list), "Slots should be a list"
     assert len(slots) > 0, "There should be at least one available slot"

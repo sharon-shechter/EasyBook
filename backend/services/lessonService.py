@@ -2,14 +2,14 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from backend.models.lessonModel import Lesson
 from backend.schemas.lessonSchema import LessonCreate, LessonResponse
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta , time
 from dateutil.parser import parse
 from backend.services.Google_apiService import calculate_departure_time, calculate_travel_time, is_time_slot_available
 import pytz
 
 EXTRA_TIME = 30
 
-def create_lesson(db: Session, lesson_data: LessonCreate, user_id: int):
+def create_lesson(db: Session, lesson_data: LessonCreate, user_id: int ,status : int ,  events):
     """Creates a new lesson in the database."""
     try:
         new_lesson = Lesson(
@@ -19,12 +19,12 @@ def create_lesson(db: Session, lesson_data: LessonCreate, user_id: int):
             end_time=lesson_data.end_time,
             lesson_type =lesson_data.lesson_type ,
             lesson_adress=lesson_data.lesson_adress, 
-            status=lesson_data.status,
             lesson_name=lesson_data.lesson_name,
             class_number=lesson_data.class_number,
             created_at=datetime.utcnow(),
             updated_at=datetime.utcnow()
-        )
+       
+           )
 
         db.add(new_lesson)
         db.commit()
@@ -38,7 +38,7 @@ def create_lesson(db: Session, lesson_data: LessonCreate, user_id: int):
             end_time=new_lesson.end_time,
             lesson_type =new_lesson.lesson_type ,
             lesson_adress=new_lesson.lesson_adress ,
-            status=new_lesson.status,
+            status= status,
             lesson_name=new_lesson.lesson_name,
             class_number=new_lesson.class_number,
             created_at=new_lesson.created_at,
@@ -61,7 +61,27 @@ def round_to_nearest_five(dt):
     return rounded_dt
 
 
-def get_possible_time_slots_for_home_lesson( lesson_adress, lesson_duration, events):
+def generate_full_day_slots(lesson_date, lesson_duration):
+    """Generate time slots from 8:00 AM to 9:00 PM based on lesson duration."""
+    try : 
+        slots = []
+        current_time = datetime.combine(lesson_date, time(8, 0)) 
+        end_of_day = datetime.combine(lesson_date, time(21, 0))  
+
+        while current_time < end_of_day:
+            end_time = current_time + timedelta(minutes=lesson_duration)
+
+            if end_time <= end_of_day:
+                slots.append((current_time, end_time))
+
+            current_time = end_time
+
+        return slots
+    except Exception as e:
+        raise Exception(f"Error generating time slots for a fre day: {str(e)}")
+
+
+def get_possible_time_slots( lesson_adress, lesson_duration, events):
     """ Identify available time slots for a new lesson by analyzing existing calendar events and travel time constraints. """
     possible_slots = []
     tz = pytz.timezone("Asia/Jerusalem")
@@ -111,3 +131,5 @@ def get_possible_time_slots_for_home_lesson( lesson_adress, lesson_duration, eve
                 raise Exception(f"Error: {str(e)}")
 
     return possible_slots
+
+
