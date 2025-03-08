@@ -4,53 +4,45 @@ from backend.models.lessonModel import Lesson
 from backend.schemas.lessonSchema import LessonCreate, LessonResponse
 from datetime import datetime, timedelta , time
 from dateutil.parser import parse
-from backend.services.Google_apiService import calculate_departure_time, calculate_travel_time, is_time_slot_available
+from backend.services.Google_apiService import calculate_departure_time, calculate_travel_time, is_time_slot_available, add_lesson_to_calendar 
 import pytz
 
 EXTRA_TIME = 30
 
-def create_lesson(db: Session, lesson_data: LessonCreate, user_id: int ,status : int ,  events):
+def create_lesson(db: Session, lesson_data: LessonCreate, user_id: int ,status : int , service): 
     """Creates a new lesson in the database."""
-    try:
-        new_lesson = Lesson(
+    try: 
+        # Pass lesson_data instead of db_lesson
+        google_event_id = add_lesson_to_calendar(service, lesson_data, user_id, db)
+    except Exception as e:
+        raise Exception(f"Error: {str(e)}")
+    
+    try : 
+        db_lesson = Lesson(
             user_id=user_id,
+            google_event_id=google_event_id,
             date=lesson_data.date,
             start_time=lesson_data.start_time,
             end_time=lesson_data.end_time,
-            lesson_type =lesson_data.lesson_type ,
-            lesson_adress=lesson_data.lesson_adress, 
+            lesson_type=lesson_data.lesson_type,
+            lesson_adress=lesson_data.lesson_adress,
+            status=status,
             lesson_name=lesson_data.lesson_name,
-            class_number=lesson_data.class_number,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow()
-       
-           )
-
-        db.add(new_lesson)
-        db.commit()
-        db.refresh(new_lesson)
-
-        return LessonResponse(
-            lesson_id=new_lesson.lesson_id,
-            user_id=new_lesson.user_id,
-            date=new_lesson.date,  
-            start_time=new_lesson.start_time,
-            end_time=new_lesson.end_time,
-            lesson_type =new_lesson.lesson_type ,
-            lesson_adress=new_lesson.lesson_adress ,
-            status= status,
-            lesson_name=new_lesson.lesson_name,
-            class_number=new_lesson.class_number,
-            created_at=new_lesson.created_at,
-            updated_at=new_lesson.updated_at
+            class_number=lesson_data.class_number
         )
 
+        db.add(db_lesson)
+        db.commit()
+        db.refresh(db_lesson)
+
+        return db_lesson
+    
     except Exception as e:
         return JSONResponse(
             status_code=500,
             content={"status": "error", "message": f"Failed to create lesson: {str(e)}"}
         )
-    
+
 def round_to_nearest_five(dt):
     """Round datetime to the nearest 5-minute mark."""
     minute = (dt.minute // 5) * 5

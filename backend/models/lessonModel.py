@@ -7,7 +7,8 @@ class Lesson(Base):
     __tablename__ = "lessons"
 
     lesson_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)  
+    user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)  
+    google_event_id = Column(String, nullable=True)
     date = Column(Date, nullable=False)  
     start_time = Column(Time, nullable=False)  
     end_time = Column(Time, nullable=False)

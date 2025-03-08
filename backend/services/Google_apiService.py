@@ -3,15 +3,18 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
+from sqlalchemy.orm import Session
 from datetime import time
 import googlemaps
 import pytz
+from backend.schemas.lessonSchema import LessonCreate
+from backend.services.userService import get_user_name_by_id
 from config import token, credentials, Google_API_KEY
 
 
 
 
-SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 
 def authenticate_google_calendar():
@@ -112,6 +115,47 @@ def is_time_slot_available(events, start_time, end_time):
         raise Exception(f"Error checking time slot availability: {str(e)}")
     
 
+def add_lesson_to_calendar(service, lesson: LessonCreate, user_id: int, db: Session):
+    """
+    Adds a lesson to Google Calendar with the user's name in the summary.
+    """
+    try:
+        tz = pytz.timezone("Asia/Jerusalem")
+        start_datetime = tz.localize(datetime.combine(lesson.date, lesson.start_time))
+        end_datetime = tz.localize(datetime.combine(lesson.date, lesson.end_time))
+
+        # Fetch the user name from the database
+        try:
+            user_name = get_user_name_by_id(db, user_id)
+        except Exception as e:
+            raise Exception(f"Error fetching user name: {str(e)}")
+        
+
+        event = {
+            "summary": f"{lesson.lesson_name} with {user_name}", 
+            "location": lesson.lesson_adress,
+            "description": f"Lesson Type: {lesson.lesson_type}\nClass Number: {lesson.class_number}",
+            "start": {
+                "dateTime": start_datetime.isoformat(),
+                "timeZone": "Asia/Jerusalem",
+            },
+            "end": {
+                "dateTime": end_datetime.isoformat(),
+                "timeZone": "Asia/Jerusalem",
+            },
+            "reminders": {
+                "useDefault": False,
+                "overrides": [
+                    {"method": "popup", "minutes": 30},
+                ],
+            },
+        }
+
+        created_event = service.events().insert(calendarId="primary", body=event).execute()
+        return created_event["id"]
+    
+    except Exception as e:
+        raise Exception(f"Error adding lesson to calendar: {str(e)}")
 
         
 

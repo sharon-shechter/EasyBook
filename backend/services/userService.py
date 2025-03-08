@@ -24,4 +24,15 @@ def create_user(db: Session, user: UserCreate):
 
 
 def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
+    try:
+        return db.query(User).filter(User.email == email).first()
+    except Exception as e:
+        return (f"no user found with this email {str(e)}")
+
+def get_user_name_by_id(db: Session, user_id: int):
+    """Retrieve a user's full name by their user_id."""
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        return f"{user.first_name} {user.last_name}"
+    except Exception as e:
+        return (f"no user found with this id {str(e)}")

@@ -9,7 +9,6 @@ class LessonCreate(BaseModel):
     duration: int  
     lesson_type: str
     lesson_adress: str
-    status: int  
     lesson_name: str
     class_number: int
 
@@ -18,6 +17,7 @@ class LessonCreate(BaseModel):
 class LessonResponse(BaseModel):
     lesson_id: int  
     user_id: int
+    google_event_id : str
     date: date  
     start_time: time
     end_time: time

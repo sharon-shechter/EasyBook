@@ -13,7 +13,6 @@ router = APIRouter()
 @router.post("/create", response_model=LessonResponse )
 def create_lesson_endpoint(
     lesson_data: LessonCreate,
-    status: int, 
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)  # Extract user from JWT
 ):
@@ -22,7 +21,8 @@ def create_lesson_endpoint(
     user_id = int(current_user.get("sub"))  # Extract user ID from JWT
 
     try:
-        new_lesson = create_lesson(db, lesson_data, user_id , status)
+        service = authenticate_google_calendar()
+        new_lesson = create_lesson(db, lesson_data, user_id , 0 , service)
         return new_lesson
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

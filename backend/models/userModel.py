@@ -6,7 +6,7 @@ from backend.database.database import Base
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     admin = Column(Boolean, nullable=False, default=False)  
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)  

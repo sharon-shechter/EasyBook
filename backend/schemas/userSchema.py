@@ -17,7 +17,7 @@ class UserCreate(BaseModel):
     address: Optional[str] = None
 
 class UserResponse(BaseModel):
-    id: int
+    user_id: int
     admin: bool  
     email: EmailStr
     first_name: str
