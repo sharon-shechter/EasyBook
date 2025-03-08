@@ -32,7 +32,7 @@ def get_user_by_email(db: Session, email: str):
 def get_user_name_by_id(db: Session, user_id: int):
     """Retrieve a user's full name by their user_id."""
     try:
-        user = db.query(User).filter(User.id == user_id).first()
+        user = db.query(User).filter(User.user_id == user_id).first()
         return f"{user.first_name} {user.last_name}"
     except Exception as e:
         return (f"no user found with this id {str(e)}")

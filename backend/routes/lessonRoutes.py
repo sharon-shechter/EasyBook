@@ -2,11 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from datetime import date
 from fastapi import Body
 from sqlalchemy.orm import Session
+from backend.models.lessonModel import Lesson
 from backend.database.database import get_db
 from backend.schemas.lessonSchema import LessonCreate, LessonResponse
 from backend.utilities.token import get_current_user
-from backend.services.Google_apiService import authenticate_google_calendar , get_events_of_date 
-from backend.services.lessonService import create_lesson, get_possible_time_slots , generate_full_day_slots , get_user_lessons
+from backend.services.Google_apiService import authenticate_google_calendar , get_events_of_date , delete_event_from_calendar 
+from backend.services.lessonService import create_lesson, get_possible_time_slots , generate_full_day_slots , get_user_lessons, delete_lesson_from_db
 
 router = APIRouter()
 
@@ -27,6 +28,37 @@ def create_lesson_endpoint(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+
+
+
+@router.delete("/delete/{lesson_id}")
+def delete_lesson(
+    lesson_id: int ,
+    db: Session = Depends(get_db)
+):
+    "Delete lesson by lesson_id"
+
+    # Fetch lesson from DB
+    lesson = db.query(Lesson).filter(Lesson.lesson_id == lesson_id).first()
+    if not lesson:
+        raise HTTPException(status_code=400, detail= "Lesson not found")
+    try:
+        service = authenticate_google_calendar()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+    try:
+        # Delete event from Google Calendar 
+        if lesson.google_event_id:
+            delete_event_from_calendar(service, lesson.google_event_id)
+
+        # Delete lesson from the database
+        delete_lesson_from_db(db, lesson_id)
+
+        return {"status": "success", "message": "Lesson deleted successfully"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting lesson: {str(e)}")
+
 
 
 @router.get("/get_lessons")

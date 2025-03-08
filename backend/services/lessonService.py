@@ -1,5 +1,5 @@
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session , joinedload
+from sqlalchemy.orm import Session 
 from backend.models.lessonModel import Lesson
 from backend.schemas.lessonSchema import LessonCreate
 from datetime import datetime, timedelta , time
@@ -60,6 +60,23 @@ def get_user_lessons(db: Session, user_id: int):
 
     except Exception as e:
         raise Exception(f"Error fetching user lessons: {str(e)}")
+    
+
+def delete_lesson_from_db(db: Session, lesson_id: int):
+    """
+    Delete a lesson from the database by lesson_id.
+    """
+    try:
+        lesson = db.query(Lesson).filter(Lesson.lesson_id == lesson_id).first()
+        if not lesson:
+            raise Exception("Lesson not found")
+
+        db.delete(lesson)
+        db.commit()
+
+    except Exception as e:
+        raise Exception(f"Error deleting lesson: {str(e)}")
+    
 
 def round_to_nearest_five(dt):
     """Round datetime to the nearest 5-minute mark."""

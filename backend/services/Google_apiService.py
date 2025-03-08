@@ -135,6 +135,7 @@ def add_lesson_to_calendar(service, lesson: LessonCreate, user_id: int, db: Sess
             "summary": f"{lesson.lesson_name} with {user_name}", 
             "location": lesson.lesson_adress,
             "description": f"Lesson Type: {lesson.lesson_type}\nClass Number: {lesson.class_number}",
+            "colorId": "11",
             "start": {
                 "dateTime": start_datetime.isoformat(),
                 "timeZone": "Asia/Jerusalem",
@@ -156,7 +157,17 @@ def add_lesson_to_calendar(service, lesson: LessonCreate, user_id: int, db: Sess
     
     except Exception as e:
         raise Exception(f"Error adding lesson to calendar: {str(e)}")
+    
 
+def delete_event_from_calendar(service, google_event_id: str):
+    """
+    Deletes an event from Google Calendar using the event ID.
+    """
+    try:
+        service.events().delete(calendarId="primary", eventId=google_event_id).execute()
+    
+    except Exception as e:
+       raise Exception(f"Error deleting event from calendar: {str(e)}")
         
 
 # -------------------- Maps API --------------------
