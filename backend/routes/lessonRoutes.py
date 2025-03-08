@@ -6,7 +6,7 @@ from backend.database.database import get_db
 from backend.schemas.lessonSchema import LessonCreate, LessonResponse
 from backend.utilities.token import get_current_user
 from backend.services.Google_apiService import authenticate_google_calendar , get_events_of_date 
-from backend.services.lessonService import create_lesson, get_possible_time_slots , generate_full_day_slots
+from backend.services.lessonService import create_lesson, get_possible_time_slots , generate_full_day_slots , get_user_lessons
 
 router = APIRouter()
 
@@ -26,6 +26,26 @@ def create_lesson_endpoint(
         return new_lesson
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+
+@router.get("/get_lessons")
+def fetch_user_lessons(
+    db: Session = Depends(get_db), 
+    current_user: dict = Depends(get_current_user)  # Extract user from JWT
+):
+    """
+    API endpoint to fetch all lessons for a user.
+    """
+    user_id = int(current_user.get("sub"))  # Extract user ID from JWT
+    try: 
+        return get_user_lessons(db, user_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+
     
     
 @router.post("/possible_slots")

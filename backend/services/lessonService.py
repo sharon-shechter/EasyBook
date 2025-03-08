@@ -1,7 +1,7 @@
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session , joinedload
 from backend.models.lessonModel import Lesson
-from backend.schemas.lessonSchema import LessonCreate, LessonResponse
+from backend.schemas.lessonSchema import LessonCreate
 from datetime import datetime, timedelta , time
 from dateutil.parser import parse
 from backend.services.Google_apiService import calculate_departure_time, calculate_travel_time, is_time_slot_available, add_lesson_to_calendar 
@@ -42,6 +42,24 @@ def create_lesson(db: Session, lesson_data: LessonCreate, user_id: int ,status :
             status_code=500,
             content={"status": "error", "message": f"Failed to create lesson: {str(e)}"}
         )
+    
+def get_user_lessons(db: Session, user_id: int):
+    """
+    Fetch all lessons for a specific user with user details.
+    """
+    try:
+        lessons = (
+            db.query(Lesson)
+            .filter(Lesson.user_id == user_id)
+            .all()
+        )
+
+        if not lessons:
+            raise Exception("No lessons found for this user")
+        return lessons
+
+    except Exception as e:
+        raise Exception(f"Error fetching user lessons: {str(e)}")
 
 def round_to_nearest_five(dt):
     """Round datetime to the nearest 5-minute mark."""
