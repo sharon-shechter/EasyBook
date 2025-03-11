@@ -3,12 +3,14 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 from sqlalchemy.orm import Session
 from datetime import time
+from fastapi import HTTPException
 import googlemaps
 import pytz
 from backend.schemas.lessonSchema import LessonCreate
-from backend.services.userService import get_user_name_by_id
+from backend.services.userService import get_user_full_name
 from config import token, credentials, Google_API_KEY
 
 
@@ -36,8 +38,6 @@ def authenticate_google_calendar():
 
     except Exception as e:
         raise Exception(f"Google API authentication failed: {str(e)}")
-    
-
 
 def get_events_of_date(service, date):
     """
@@ -56,38 +56,36 @@ def get_events_of_date(service, date):
             singleEvents=True,
             orderBy="startTime",
         ).execute()
-
         events = events_result.get("items", [])
         return events
 
     except Exception as e:
-        raise Exception(f"Failed to retrieve events: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching events: {str(e)}")
     
 def is_reasonable_time_slot(start_time, end_time):
     """Make sure the time slot is reasonable"""
+    try:
+        earliest_time = time(8, 0)  
+        latest_time = time(21, 0)  
 
-    earliest_time = time(8, 0)  
-    latest_time = time(21, 0)  
+        # Extract time portion from datetime
+        start_time_hour = start_time.time()
+        end_time_hours = end_time.time()
 
-    # Extract time portion from datetime
-    start_time_hour = start_time.time()
-    end_time_hours = end_time.time()
-
-    if start_time_hour < earliest_time or start_time_hour > latest_time:
-        return False
-    if end_time_hours > latest_time:
-        return False
-    return True
+        if start_time_hour < earliest_time or start_time_hour > latest_time:
+            return False
+        if end_time_hours > latest_time:
+            return False
+        return True
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error checking time slot reasonable: {str(e)}")
 
 def is_time_slot_available(events, start_time, end_time):
     """
     Check if a given time slot is available.
     """
-    try: 
-        if not is_reasonable_time_slot(start_time, end_time):
-            return False
-    except Exception as e:
-        raise Exception(f"Error checking time slot resenoable: {str(e)}")
+    if not is_reasonable_time_slot(start_time, end_time):
+        return False
     if not events:
         return True  
 
@@ -112,10 +110,10 @@ def is_time_slot_available(events, start_time, end_time):
         return True  
 
     except Exception as e:
-        raise Exception(f"Error checking time slot availability: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error checking time slot availability: {str(e)}")
     
 
-def add_lesson_to_calendar(service, lesson: LessonCreate, user_id: int, db: Session):
+def add_lesson_to_calendar(service, db :Session ,lesson: LessonCreate, user_id: int):
     """
     Adds a lesson to Google Calendar with the user's name in the summary.
     """
@@ -125,12 +123,7 @@ def add_lesson_to_calendar(service, lesson: LessonCreate, user_id: int, db: Sess
         end_datetime = tz.localize(datetime.combine(lesson.date, lesson.end_time))
 
         # Fetch the user name from the database
-        try:
-            user_name = get_user_name_by_id(db, user_id)
-        except Exception as e:
-            raise Exception(f"Error fetching user name: {str(e)}")
-        
-
+        user_name = get_user_full_name(db, user_id)
         event = {
             "summary": f"{lesson.lesson_name} with {user_name}", 
             "location": lesson.lesson_adress,
@@ -156,21 +149,26 @@ def add_lesson_to_calendar(service, lesson: LessonCreate, user_id: int, db: Sess
         return created_event["id"]
     
     except Exception as e:
-        raise Exception(f"Error adding lesson to calendar: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error adding lesson to calendar: {str(e)}")
     
 
 def delete_event_from_calendar(service, google_event_id: str):
     """
     Deletes an event from Google Calendar using the event ID.
+    Gracefully handles errors like event already deleted or not found.
     """
     try:
         service.events().delete(calendarId="primary", eventId=google_event_id).execute()
-    
+        return {"status": "success", "detail": "Event deleted successfully"}
+
+    except HttpError as e:
+        raise HTTPException(status_code=404, detail=f'Event not found {str(e)}')
     except Exception as e:
-       raise Exception(f"Error deleting event from calendar: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error deleting event from calendar: {str(e)}")
         
 
 # -------------------- Maps API --------------------
+
 def calculate_travel_time(origin, destination, departure_time):
     """
     Calculate the estimated travel time from origin to destination at a specific departure time.
@@ -186,20 +184,34 @@ def calculate_travel_time(origin, destination, departure_time):
             departure_time=departure_time
         )
 
-        if directions:
-            try:
-                duration_seconds = directions[0]['legs'][0]['duration']['value']
-                duration_minutes = duration_seconds // 60  # Convert seconds to minutes
-                return duration_minutes
-            except (KeyError, IndexError, TypeError) as e:
-                return e
-        else:
-            return ValueError("No directions found.")
+        if not directions:
+            raise ValueError("No directions found.")
+
+        try:
+            duration_seconds = directions[0]['legs'][0]['duration']['value']
+            duration_minutes = duration_seconds // 60  # Convert seconds to minutes
+            return duration_minutes
+        except (KeyError, IndexError, TypeError) as e:
+            raise ValueError(f"Invalid response format from Google Maps API: {str(e)}")
+
+    except googlemaps.exceptions.ApiError as e:
+        raise HTTPException(status_code=500, detail=f"Google Maps API error: {str(e)}")
+    
+    except googlemaps.exceptions.TransportError as e:
+        raise HTTPException(status_code=500, detail=f"Google Maps connection error: {str(e)}")
+    
+    except googlemaps.exceptions.HTTPError as e:
+        raise HTTPException(status_code=500, detail=f"Google Maps HTTP error: {str(e)}")
+
+    except googlemaps.exceptions.Timeout as e:
+        raise HTTPException(status_code=504, detail=f"Google Maps request timeout: {str(e)}")
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     except Exception as e:
-        raise Exception(f"Error checking time slot availability: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Unexpected error calculating travel time: {str(e)}")
 
-        
 
 def calculate_departure_time(origin, destination, arrival_time):
     """ 
@@ -210,29 +222,40 @@ def calculate_departure_time(origin, destination, arrival_time):
         gmaps = googlemaps.Client(key=Google_API_KEY)
 
         # Request directions with arrival_time
-
-        try:
-                directions = gmaps.directions(
-                    origin=origin,
-                    destination=destination,
-                    mode="driving",  # Can be "walking", "transit", or "bicycling" 
-                    arrival_time=arrival_time_unix  # Must be an integer 
-                )
-        except Exception as e:
-            raise Exception(f"Error getting directions: {str(e)}")
-        
+        directions = gmaps.directions(
+            origin=origin,
+            destination=destination,
+            mode="driving",  # Can be "walking", "transit", or "bicycling" 
+            arrival_time=arrival_time_unix  # Must be an integer 
+        )
 
         if not directions:
-            return ValueError("No route found between the given locations.")
+            raise ValueError("No route found between the given locations.")
 
-        # Extract travel duration in seconds
         try:
+            # Extract travel duration in seconds
             travel_time_seconds = directions[0]['legs'][0]['duration']['value']
             departure_time = arrival_time - timedelta(seconds=travel_time_seconds)
-            return departure_time.strftime("%Y-%m-%d %H:%M:%S") 
+            return departure_time.strftime("%Y-%m-%d %H:%M:%S")
         except (KeyError, IndexError, TypeError) as e:
-            return e
+            raise ValueError(f"Invalid response format from Google Maps API: {str(e)}")
+
+    except googlemaps.exceptions.ApiError as e:
+        raise HTTPException(status_code=500, detail=f"Google Maps API error: {str(e)}")
+    
+    except googlemaps.exceptions.TransportError as e:
+        raise HTTPException(status_code=500, detail=f"Google Maps connection error: {str(e)}")
+    
+    except googlemaps.exceptions.HTTPError as e:
+        raise HTTPException(status_code=500, detail=f"Google Maps HTTP error: {str(e)}")
+
+    except googlemaps.exceptions.Timeout as e:
+        raise HTTPException(status_code=504, detail=f"Google Maps request timeout: {str(e)}")
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     except Exception as e:
-        raise Exception(f"Error calculating departure time: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Unexpected error calculating departure time: {str(e)}")
+
     

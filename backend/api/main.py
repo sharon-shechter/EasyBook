@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from backend.database.database import engine, Base
-from backend.routes import userRoutes,lessonRoutes  
+from backend.api.routes import userRoutes,lessonRoutes  
 
 app = FastAPI(title="EasyBook API", version="1.0")
 
