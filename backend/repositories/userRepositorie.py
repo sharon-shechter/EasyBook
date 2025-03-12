@@ -49,6 +49,6 @@ def get_user_by_id(db: Session, user_id: int):
         user =  db.query(User).filter(User.user_id == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        return {"status": "success", "details" : "user deleted successfully"}
+        return user
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching user: {str(e)}")
