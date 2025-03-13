@@ -107,26 +107,5 @@ def get_tools():
                         }
                     }
                 }, 
-        {
-            "type": "function",
-            "function": {
-                "name": "login_tool",
-                "description": "Authenticates a user and returns a JWT token.",
-                "parameters": json.loads(LoginRequest.schema_json())
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "delete_user_tool",
-                "description": "Deletes a user by ID.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "user_id": {"type": "integer", "description": "The ID of the user to delete"}
-                    },
-                    "required": ["user_id"]
-                }
-            }
-        }
+            
     )

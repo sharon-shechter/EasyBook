@@ -10,7 +10,7 @@ from backend.repositories.userRepositorie import get_user_by_id
 from sqlalchemy.orm import Session
 from backend.agent.tools import get_tools
 from backend.schemas.lessonSchema import LessonCreate
-from backend.services.agentService import create_lesson_tool, delete_lesson_tool, get_lessons_tool,possible_time_slots_tool
+from backend.services.agentService import create_lesson_tool, delete_lesson_tool, get_lessons_tool,possible_time_slots_tool , user_login_tool
 
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -87,6 +87,7 @@ def chatbot_conversation(db: Session, user_id: int, user_input: str):
                     result = user_signup_tool(user_data, db)
                     assistant_reply = result if result else "User signup failed."
 
+                
 
                 # Store function response in history
                 conversation_history.append({"role": "assistant", "content": assistant_reply})
