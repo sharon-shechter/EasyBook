@@ -12,12 +12,14 @@ def create_lesson_service(db: Session, lesson_data, user_id: int, status: int, g
     """Handles business logic for lesson creation."""
     google_event_id = add_lesson_to_calendar(google_service, db ,  lesson_data, user_id)
     new_lesson  = create_lesson(db, lesson_data, user_id, google_event_id, status)
+    print ("db_lesson", new_lesson)
     return new_lesson
 
 
 
 def delete_lesson_service( lesson_id: int, user_id : int,  google_service , db: Session,):
     """Handles deleting a lesson and its Google Calendar event."""
+    print ("start delete_lesson_service")
     try:
         lesson = get_lessons_by_lesson_id(db, lesson_id)
         event_id = lesson.google_event_id

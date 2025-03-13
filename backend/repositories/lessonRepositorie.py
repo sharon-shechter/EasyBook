@@ -37,7 +37,7 @@ def get_lessons_by_lesson_id(db: Session, lesson_id: int):
         lesson =  db.query(Lesson).filter(Lesson.lesson_id == lesson_id).first()
         if not lesson:
             raise HTTPException(status_code=404, detail="No lessons found ")
-        return True
+        return lesson
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching lesson: {str(e)}")
     
