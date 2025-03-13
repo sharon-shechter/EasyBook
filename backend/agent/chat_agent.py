@@ -1,62 +1,34 @@
 import openai
 import os
 import json
+from datetime import date
 from fastapi import HTTPException
 from backend.database.database import get_db
+from backend.schemas.userSchema import UserCreate
+from backend.services.agentService import user_signup_tool
 from backend.repositories.userRepositorie import get_user_by_id
 from sqlalchemy.orm import Session
+from backend.agent.tools import get_tools
 from backend.schemas.lessonSchema import LessonCreate
-from backend.repositories.lessonRepositorie import get_all_user_lessons
-from backend.services.Google_apiService import authenticate_google_calendar 
-from backend.services.lessonService import create_lesson_service, delete_lesson_service, get_possible_time_slots
+from backend.services.agentService import create_lesson_tool, delete_lesson_tool, get_lessons_tool,possible_time_slots_tool
 
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+TODAY = date.today()
 
 # In-memory storage for conversation history
-local_storage = {}  # { user_id: conversation_history }
+local_storage = {}  
 
 
-# Tool function for lesson creation
-def create_lesson_tool(lesson_data: LessonCreate, db: Session, user_id: int):
-    try:
-        service = authenticate_google_calendar()
-        new_lesson = create_lesson_service(db, lesson_data, user_id, 0, service)
-        return new_lesson
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to create lesson - {e}")
 
-
-# Tool function for deleting a lesson
-def delete_lesson_tool(lesson_id: int, db: Session, user_id: int):
-    try:
-        service = authenticate_google_calendar()
-        delete_lesson_service(lesson_id, user_id, service, db)
-        return {"status": "success", "message": "Lesson deleted successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to delete lesson - {e}")
-
-
-# Tool function for fetching all lessons
-def get_lessons_tool(db: Session, user_id: int ):
-    try:
-        lessons = get_all_user_lessons(db, user_id)
-        return lessons
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to fetch lessons - {e}")
-
-
-# Chatbot conversation function that continues based on history
 def chatbot_conversation(db: Session, user_id: int, user_input: str):
     # Retrieve conversation history or start a new one
     if user_id not in local_storage:
         local_storage[user_id] = []
 
     conversation_history = local_storage[user_id]
-
-    # ✅ Ensure system message is only added once
     if not any(msg["role"] == "system" for msg in conversation_history):
-        conversation_history.insert(0, {"role": "system", "content": "You are a helpful assistant guiding a user to manage their lessons."})
+        conversation_history.insert(0, {"role": "system", "content": f'You are a helpful assistant guiding a user to manage their lessons. To day is {str(TODAY)}.'})
 
     # Add user input to conversation history
     conversation_history.append({"role": "user", "content": user_input})
@@ -65,49 +37,8 @@ def chatbot_conversation(db: Session, user_id: int, user_input: str):
     response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=conversation_history,
-        tools=[
-            {
-                "type": "function",
-                "function": {
-                    "name": "create_lesson_tool",
-                    "description": "Creates a new lesson given the required details.",
-                    "parameters": json.loads(LessonCreate.schema_json())  
-                }
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "delete_lesson_tool",
-                    "description": "Deletes a lesson by ID.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "lesson_id": {"type": "integer", "description": "The ID of the lesson to delete"}
-                        },
-                        "required": ["lesson_id"]
-                    }
-                }
-            },
-                    {
-                "type": "function",
-                "function": {
-                    "name": "get_lessons_tool",
-                    "description": "Fetches all lessons for a specific user.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "user_id": {
-                                "type": "integer",
-                                "description": "The ID of the user whose lessons should be retrieved."
-                            }
-                        },
-                        "required": ["user_id"]
-                    }
-                }
-            },  
-         
-    ]
-)
+        tools= get_tools()
+    )
 
     assistant_reply = response["choices"][0]["message"].get("content", "")
 
@@ -133,16 +64,35 @@ def chatbot_conversation(db: Session, user_id: int, user_input: str):
                     result = delete_lesson_tool(lesson_id, db, user_id)
                     assistant_reply = result["message"]
                 
-                elif function_name == "get_lessons_tool":
-                    result = get_lessons_tool(db, user_id)
-                    assistant_reply = f"Here are your lessons: {result}" if result else "No lessons found."
+                elif function_name == "signup_tool":
+                    print("Function detected: signup_tool")  # Debug print
+                    user_data = UserCreate(**function_args)
+                    print(f"Parsed user data: {user_data}")  # Debug print
+                    
+                    result = user_signup_tool(user_data, db)
+                    print(f"Signup result: {result}")  # Debug print
+
+                    assistant_reply = "User signed up successfully." if result else "Failed to sign up."
+
+
+                elif function_name == "possible_time_slots_tool":
+                    lesson_date = function_args["lesson_date"]
+                    lesson_address = function_args["lesson_address"]
+                    lesson_duration = function_args["lesson_duration"]
+                    result = possible_time_slots_tool(lesson_date, lesson_address, lesson_duration, user_id)
+                    assistant_reply = f"Possible time slots: {result}" if result else "No available time slots found."
+
+                elif function_name == "user_signup_tool":
+                    user_data = UserCreate(**function_args)
+                    result = user_signup_tool(user_data, db)
+                    assistant_reply = result if result else "User signup failed."
+
 
                 # Store function response in history
                 conversation_history.append({"role": "assistant", "content": assistant_reply})
 
-            except Exception:
-                assistant_reply = "An error occurred while processing your request."
-
+            except Exception as e:
+                assistant_reply = f"Error executing function: {str(e)}"
     # Update the stored history
     local_storage[user_id] = conversation_history
 

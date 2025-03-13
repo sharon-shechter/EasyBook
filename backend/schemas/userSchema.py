@@ -8,7 +8,7 @@ class LoginRequest(BaseModel):
     password: str
 
 class UserCreate(BaseModel):
-    admin: bool 
+    admin: Optional[bool] = False
     email: EmailStr
     password: str  
     first_name: str

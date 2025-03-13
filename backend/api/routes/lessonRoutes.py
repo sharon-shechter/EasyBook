@@ -83,13 +83,12 @@ def possible_time_slots(
     try:
         # Extract values manually
         lesson_date = date.fromisoformat(request_data.get("lesson_date"))
-        lesson_type = request_data.get("lesson_type")
         lesson_address = request_data.get("lesson_address")
         lesson_duration = request_data.get("lesson_duration")
 
 
         # Validate extracted values
-        if not lesson_date or not lesson_type or not lesson_duration:
+        if not lesson_date or not lesson_duration:
             raise HTTPException(status_code=400, detail="Missing required fields in request data")
         events = get_events_of_date(service, lesson_date)
     
