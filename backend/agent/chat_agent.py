@@ -1,32 +1,48 @@
 import openai
 import os
 import json
+import time
+import threading
 from datetime import date
 from fastapi import HTTPException
-from backend.database.database import get_db
 from backend.schemas.userSchema import UserCreate
 from backend.services.agentService import user_signup_tool
-from backend.repositories.userRepositorie import get_user_by_id
 from sqlalchemy.orm import Session
 from backend.agent.tools import get_tools
 from backend.schemas.lessonSchema import LessonCreate
-from backend.services.agentService import create_lesson_tool, delete_lesson_tool, get_lessons_tool,possible_time_slots_tool , user_login_tool
+from backend.services.agentService import create_lesson_tool, delete_lesson_tool, get_lessons_tool,possible_time_slots_tool 
+
+EXPIRATION_TIME = 300
+
+local_storage = {"1": {"messages": [], "timestamp": time.time()}}
+
+def cleanup_old_sessions():
+    while True:
+        time.sleep(10)  
+        current_time = time.time()
+        
+        for user_id in list(local_storage.keys()):  # Iterate over a copy of keys
+            if current_time - local_storage[user_id]["timestamp"] > EXPIRATION_TIME:
+                print(f"Deleting conversation history for user {user_id}")
+                del local_storage[user_id]  # Remove expired user history
+
+
 
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 TODAY = date.today()
 
 # In-memory storage for conversation history
-local_storage = {}  
-
-
+def print_local_storage():
+    print("Local storage:", local_storage)
 
 def chatbot_conversation(db: Session, user_id: int, user_input: str):
     # Retrieve conversation history or start a new one
     if user_id not in local_storage:
-        local_storage[user_id] = []
+        local_storage[user_id] = {"messages": [], "timestamp": time.time()}
 
-    conversation_history = local_storage[user_id]
+    local_storage[user_id]["timestamp"] = time.time()  # Update last interaction time
+    conversation_history = local_storage[user_id]["messages"]
     if not any(msg["role"] == "system" for msg in conversation_history):
         conversation_history.insert(0, {"role": "system", "content": f'You are a helpful assistant guiding a user to manage their lessons. To day is {str(TODAY)}.'})
 
@@ -35,7 +51,7 @@ def chatbot_conversation(db: Session, user_id: int, user_input: str):
 
     # Generate response from OpenAI
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="o3-mini",
         messages=conversation_history,
         tools= get_tools()
     )
@@ -94,8 +110,6 @@ def chatbot_conversation(db: Session, user_id: int, user_input: str):
 
             except Exception as e:
                 assistant_reply = f"Error executing function: {str(e)}"
-    # Update the stored history
-    local_storage[user_id] = conversation_history
 
     return {"response": assistant_reply}
 

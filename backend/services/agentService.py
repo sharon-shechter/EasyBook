@@ -1,7 +1,6 @@
 from fastapi import HTTPException
 from datetime import date
 from sqlalchemy.orm import Session
-from backend.services.userService import login_user_service
 from backend.services.lessonService import get_possible_time_slots, generate_full_day_slots , create_lesson_service, delete_lesson_service
 from backend.services.Google_apiService import authenticate_google_calendar , get_events_of_date
 from backend.repositories.lessonRepositorie import get_all_user_lessons
@@ -69,6 +68,8 @@ def user_signup_tool(user_data: UserCreate, db: Session):
         return new_user
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to create user - {e}")
+    
+
     
 
 
