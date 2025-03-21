@@ -1,4 +1,19 @@
+# Python files
 config.py
 __pycache__/config.cpython-312.pyc
 .env
 
+# Node dependencies
+/node_modules
+
+
+# Build output
+/dist
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Vite cache
+/.vite

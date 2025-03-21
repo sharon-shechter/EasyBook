@@ -15,6 +15,3 @@ class ChatRequest(BaseModel):
 def chat_with_agent(request: ChatRequest, db: Session = Depends(get_db)):
     response = chatbot_conversation(db, request.user_id, request.content)
     return response
-@router.get("/test")
-def test():
-    return print_local_storage()
