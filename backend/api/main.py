@@ -1,13 +1,20 @@
 import threading
-import time
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware  # ✅ ADD THIS
 from backend.database.database import engine, Base
 from backend.api.routes import userRoutes, lessonRoutes, agentRoutes
 from backend.agent.chat_agent import cleanup_old_sessions  # Import cleanup function
 
 app = FastAPI(title="EasyBook API", version="1.0")
 
-# Create database tables (if they don't exist)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 Base.metadata.create_all(bind=engine)
 
 # Include API routes
