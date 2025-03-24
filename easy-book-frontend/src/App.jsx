@@ -3,10 +3,12 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import LogIn from "./pages/LogIn";
 import SignUp from "./pages/SignUp";
-import ManageLessons from "./pages/ManageLessons";
+import UserDashboard from "./pages/UserDashboard";
 import ChatWithAgent from "./pages/ChatWithAgent"; 
 import BookLesson from "./pages/BookLesson";
 import Navbar from "./components/Navbar";
+import ManageMyLessons from "./pages/ManageMyLessons";
+
 
 export default function App() {
   return (
@@ -17,8 +19,9 @@ export default function App() {
         <Route path="/login" element={<LogIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/book" element={<BookLesson />} />
-        <Route path="/lessons" element={<ManageLessons />} />
+        <Route path="/dashboard" element={<UserDashboard />} />
         <Route path="/chat" element={<ChatWithAgent />} /> 
+        <Route path="/my-lessons" element={<ManageMyLessons />} />
       </Routes>
     </div>
   );

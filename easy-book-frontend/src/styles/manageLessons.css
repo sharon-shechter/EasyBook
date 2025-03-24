@@ -21,3 +21,18 @@
     cursor: pointer;
   }
   
+
+  .user-card {
+    background: #eef;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  }
+  .user-card h3 {
+    margin-bottom: 10px;
+  }
+  .user-card p {
+    margin: 4px 0;
+  }
+  

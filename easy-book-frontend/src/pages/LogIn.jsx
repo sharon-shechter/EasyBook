@@ -28,7 +28,7 @@ export default function LogIn() {
       localStorage.setItem("token", token);
       localStorage.setItem("userEmail", formData.email);
       alert("Login successful!");
-      navigate("/lessons");
+      navigate("/dashboard");
     } catch (err) {
       console.error("Login error:", err);
       alert("Login failed: " + err.message);
