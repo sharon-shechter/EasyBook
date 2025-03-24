@@ -1,0 +1,31 @@
+.book-lesson-container {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #f7f7f7;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+  }
+  
+  .lesson-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .lesson-form input, .lesson-form button {
+    padding: 10px;
+    font-size: 16px;
+  }
+  
+  .slot-option {
+    display: block;
+    margin: 10px 0;
+  }
+  
+  .lesson-summary {
+    background: #d4edda;
+    padding: 15px;
+    border-radius: 10px;
+  }
+  

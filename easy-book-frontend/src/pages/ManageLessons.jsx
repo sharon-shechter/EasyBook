@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; 
 import "../styles/manageLessons.css";
 
 export default function ManageLessons() {
   const [userData, setUserData] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -30,8 +32,8 @@ export default function ManageLessons() {
         <div className="user-card">
           <h2>Hello {userData.first_name} 👋</h2>
           <div className="manage-buttons">
-            <button>Chat Agent</button>
-            <button>Book a New Lesson</button>
+            <button onClick={() => navigate("/chat")}>Chat Agent</button>
+            <button onClick={() => navigate("/book")}>Book a New Lesson</button>
             <button>Manage My Lessons</button>
           </div>
         </div>
