@@ -1,8 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
-    admin: false,
     email: "",
     password: "",
     first_name: "",
@@ -11,6 +11,8 @@ export default function SignUp() {
     address: "",
   });
 
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -18,7 +20,7 @@ export default function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://127.0.0.1:8000/users/login", {
+      const response = await fetch("http://127.0.0.1:8000/users/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -26,18 +28,17 @@ export default function SignUp() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.detail || "Login failed");
+        throw new Error(error.detail || "Signup failed");
       }
 
-      const token = await response.text();
-      localStorage.setItem("token", token);
-      alert("Login successful!");
+      alert("Account created successfully!");
+      navigate("/login"); 
+
     } catch (err) {
-      console.error("Login error:", err);
-      alert("Login failed: " + err.message);
+      console.error("Signup error:", err);
+      alert("Signup failed: " + err.message);
     }
   };
-
 
   return (
     <div>

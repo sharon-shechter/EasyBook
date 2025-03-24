@@ -34,6 +34,7 @@ def login_user_service(db: Session, email: str, password: str):
     access_token = create_access_token(data={"sub": str(db_user.user_id)})
     return {"access_token": access_token, "token_type": "bearer"}
 
+
 def get_user_full_name(db: Session, user_id: int):
     """Retrieve a user's full name."""
     user = get_user_by_id(db, user_id)
@@ -41,3 +42,4 @@ def get_user_full_name(db: Session, user_id: int):
         raise HTTPException(status_code=404, detail="User not found")
     
     return f"{user.first_name} {user.last_name}"
+

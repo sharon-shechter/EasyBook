@@ -1,8 +1,11 @@
+// src/App.jsx
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import SignIn from "./pages/SignIn";
+import SignIn from "./pages/LogIn";
 import SignUp from "./pages/SignUp";
+import ManageLessons from "./pages/ManageLessons";
 import Navbar from "./components/Navbar";
+import LogIn from "./pages/LogIn";
 
 export default function App() {
   return (
@@ -10,8 +13,9 @@ export default function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/signin" element={<SignIn />} />
+        <Route path="/login" element={<LogIn />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/lessons" element={<ManageLessons />} />
       </Routes>
     </div>
   );

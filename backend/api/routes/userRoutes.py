@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from backend.repositories.userRepositorie import delete_user_from_db
+from backend.repositories.userRepositorie import delete_user_from_db , get_user_by_email
 from backend.schemas.userSchema import UserCreate, UserResponse
 from backend.services.userService import signup_user_service,login_user_service
 from backend.database.database import get_db
@@ -19,6 +19,11 @@ def login(user: LoginRequest, db: Session = Depends(get_db)):
     """Authenticate user and return JWT token."""
     access_token = login_user_service (db, user.email, user.password)
     return access_token
+
+@router.get("/get_user/{email}")
+def get_user(email: str, db: Session = Depends(get_db) , current_user: dict = Depends(get_current_user)):
+    """ get user by user_id"""
+    return  get_user_by_email(db, email)
 
 @router.delete("/delete/{user_id}")
 def delete_user(user_id: int, db: Session = Depends(get_db) , current_user: dict = Depends(get_current_user)):

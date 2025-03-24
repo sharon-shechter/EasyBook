@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function SignIn() {
+export default function LogIn() {
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -10,23 +12,23 @@ export default function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:8000/users/login", {
+      const response = await fetch("http://127.0.0.1:8000/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-  
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.detail || "Login failed");
       }
-  
-      const token = await response.text(); // assuming FastAPI returns the token as plain text
-      localStorage.setItem("token", token); // store JWT token
+
+      const data = await response.json();
+      const token = data.access_token;
+      localStorage.setItem("token", token);
+      localStorage.setItem("userEmail", formData.email);
       alert("Login successful!");
-  
-      // optionally: redirect to home or another page
-      // navigate("/"); <-- if using useNavigate from react-router
+      navigate("/lessons");
     } catch (err) {
       console.error("Login error:", err);
       alert("Login failed: " + err.message);

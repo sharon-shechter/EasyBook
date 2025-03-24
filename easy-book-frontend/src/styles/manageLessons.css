@@ -1,0 +1,23 @@
+/* src/styles/manageLessons.css */
+.manage-container {
+    padding: 20px;
+  }
+  
+  .user-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .manage-buttons {
+    margin-top: 20px;
+  }
+  
+  .manage-buttons button {
+    margin-right: 10px;
+    padding: 10px 15px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
