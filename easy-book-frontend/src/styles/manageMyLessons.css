@@ -1,0 +1,70 @@
+.manage-lessons-page {
+    max-width: 1000px;
+    margin: 60px auto;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .manage-lessons-page h2 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    color: #0077ff;
+    text-align: center;
+  }
+  
+  .manage-lessons-page h3 {
+    font-size: 24px;
+    margin: 30px 0 20px;
+    color: #333;
+  }
+  
+  .lesson-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .lesson-card {
+    padding: 24px;
+    border-radius: 12px;
+    background-color: #f7f9fc;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-left: 6px solid #0077ff;
+    transition: transform 0.2s ease;
+  }
+  
+  .lesson-card:hover {
+    transform: scale(1.01);
+  }
+  
+  .lesson-card h4 {
+    font-size: 20px;
+    color: #0077ff;
+    margin-bottom: 10px;
+  }
+  
+  .lesson-card p {
+    margin: 4px 0;
+    color: #444;
+  }
+  
+  .lesson-card button {
+    margin-top: 16px;
+    background-color: #ff4d4f;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .lesson-card button:hover {
+    background-color: #d9363e;
+    transform: translateY(-1px);
+  }
+  

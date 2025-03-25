@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import '../styles/userInfo.css';
-
 
 export default function UserInfo() {
   const [userData, setUserData] = useState(null);
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
   const token = localStorage.getItem("token");
   const email = localStorage.getItem("userEmail");
 
@@ -24,16 +27,30 @@ export default function UserInfo() {
     };
 
     fetchUserData();
-  }, [email, token]); 
+  }, [email, token]);
 
-  if (!userData) return <p>Loading user info...</p>;
+  if (!userData) return null;
 
   return (
-    <div className="user-card">
-      <h3>👤 {userData.first_name} {userData.last_name}</h3>
-      <p><strong>Email:</strong> {userData.email}</p>
-      {userData.phone_number && <p><strong>Phone:</strong> {userData.phone_number}</p>}
-      {userData.address && <p><strong>Address:</strong> {userData.address}</p>}
+    <div className="floating-widget">
+      <div className={`bubble ${open ? 'open' : ''}`} onClick={() => setOpen(!open)}>
+        👋 Hello {userData.first_name}
+        <span className="arrow">{open ? "⬇️" : "⬅️"}</span>
+      </div>
+
+      {open && (
+        <div className="menu">
+          <button onClick={() => navigate("/dashboard")}>🏠 Back to Dashboard</button>
+          <button onClick={() => navigate("/profile/edit")}>🛠️ Edit Profile</button>
+
+          <hr />
+
+          <button onClick={() => {
+            localStorage.clear();
+            navigate("/login");
+          }}>🚪 Log Out</button>
+        </div>
+      )}
     </div>
   );
 }

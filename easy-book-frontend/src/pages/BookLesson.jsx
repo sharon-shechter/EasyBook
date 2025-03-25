@@ -1,5 +1,7 @@
 import { useState } from "react";
 import "../styles/bookLesson.css";
+import UserInfo from "../components/UserInfo";
+
 
 export default function BookLesson() {
   const [step, setStep] = useState(1);
@@ -95,105 +97,110 @@ export default function BookLesson() {
   };
 
   return (
-    <div className="book-lesson-container">
-      <h2>📘 Book a New Lesson</h2>
-
-      {step === 1 && (
-        <form onSubmit={fetchSlots} className="lesson-form">
-          <input
-            type="date"
-            name="lesson_date"
-            onChange={handleBasicChange}
-            required
-          />
-          <input
-            type="text"
-            name="lesson_address"
-            placeholder="Lesson Address - full address (city, street, number)"
-            onChange={handleBasicChange}
-            required
-          />
-          <input
-            type="number"
-            name="lesson_duration"
-            placeholder="Duration (in minutes)"
-            onChange={handleBasicChange}
-            required
-          />
-          <button type="submit">Find Time Slots</button>
-        </form>
-      )}
-
-      {step === 2 && (
-        <div>
-          <h3>🕓 Available Time Slots:</h3>
-          {slots.length === 0 ? (
-            <p>No available time slots for this date.</p>
-          ) : (
-            <form onSubmit={() => setStep(3)}>
-              {slots.map((slot, index) => (
-                <label key={index} className="slot-option">
-                  <input
-                    type="radio"
-                    name="slot"
-                    value={slot}
-                    onChange={() => setSelectedSlot(slot)}
-                    required
-                  />
-                  {new Date(slot[0]).toLocaleTimeString()} -{" "}
-                  {new Date(slot[1]).toLocaleTimeString()}
-                </label>
-              ))}
-              <button type="submit" disabled={!selectedSlot}>
-                Continue
-              </button>
-            </form>
-          )}
-        </div>
-      )}
-
-      {step === 3 && (
-        <form onSubmit={createLesson} className="lesson-form">
-          <h3>📋 Add Lesson Details</h3>
-          <input
-            type="text"
-            name="lesson_type"
-            placeholder="Home or Zoom"
-            onChange={handleExtraChange}
-            required
-          />
-          <input
-            type="text"
-            name="lesson_name"
-            placeholder="Lesson Name (like Math or English)" 
-            onChange={handleExtraChange}
-            required
-          />
-          <input
-            type="text"
-            name="class_number"
-            placeholder="Class"
-            onChange={handleExtraChange}
-            required
-          />
-          <button type="submit">Create Lesson</button>
-        </form>
-      )}
-
-      {step === 4 && lessonCreated && (
-        <div className="lesson-summary">
-          <h3>✅ Lesson Created Successfully!</h3>
-          <p>
-            <strong>{lessonCreated.lesson_name}</strong> on{" "}
-            {lessonCreated.date}
-          </p>
-          <p>
-            {lessonCreated.start_time} - {lessonCreated.end_time}
-          </p>
-          <p>Address: {lessonCreated.lesson_adress}</p>
-          <p>Type: {lessonCreated.lesson_type}</p>
-        </div>
-      )}
-    </div>
+    <>
+      <div className="book-lesson-container">
+        <h2>📘 Book a New Lesson</h2>
+  
+        {step === 1 && (
+          <form onSubmit={fetchSlots} className="lesson-form">
+            <input
+              type="date"
+              name="lesson_date"
+              onChange={handleBasicChange}
+              required
+            />
+            <input
+              type="text"
+              name="lesson_address"
+              placeholder="Lesson Address - full address (city, street, number)"
+              onChange={handleBasicChange}
+              required
+            />
+            <input
+              type="number"
+              name="lesson_duration"
+              placeholder="Duration (in minutes)"
+              onChange={handleBasicChange}
+              required
+            />
+            <button type="submit">Find Time Slots</button>
+          </form>
+        )}
+  
+        {step === 2 && (
+          <div>
+            <h3>🕓 Available Time Slots:</h3>
+            {slots.length === 0 ? (
+              <p>No available time slots for this date.</p>
+            ) : (
+              <form onSubmit={() => setStep(3)}>
+                {slots.map((slot, index) => (
+                  <label key={index} className="slot-option">
+                    <input
+                      type="radio"
+                      name="slot"
+                      value={slot}
+                      onChange={() => setSelectedSlot(slot)}
+                      required
+                    />
+                    {new Date(slot[0]).toLocaleTimeString()} -{" "}
+                    {new Date(slot[1]).toLocaleTimeString()}
+                  </label>
+                ))}
+                <button type="submit" disabled={!selectedSlot}>
+                  Continue
+                </button>
+              </form>
+            )}
+          </div>
+        )}
+  
+        {step === 3 && (
+          <form onSubmit={createLesson} className="lesson-form">
+            <h3>📋 Add Lesson Details</h3>
+            <input
+              type="text"
+              name="lesson_type"
+              placeholder="Home or Zoom"
+              onChange={handleExtraChange}
+              required
+            />
+            <input
+              type="text"
+              name="lesson_name"
+              placeholder="Lesson Name (like Math or English)"
+              onChange={handleExtraChange}
+              required
+            />
+            <input
+              type="text"
+              name="class_number"
+              placeholder="Class"
+              onChange={handleExtraChange}
+              required
+            />
+            <button type="submit">Create Lesson</button>
+          </form>
+        )}
+  
+        {step === 4 && lessonCreated && (
+          <div className="lesson-summary">
+            <h3>✅ Lesson Created Successfully!</h3>
+            <p>
+              <strong>{lessonCreated.lesson_name}</strong> on{" "}
+              {lessonCreated.date}
+            </p>
+            <p>
+              {lessonCreated.start_time} - {lessonCreated.end_time}
+            </p>
+            <p>Address: {lessonCreated.lesson_adress}</p>
+            <p>Type: {lessonCreated.lesson_type}</p>
+          </div>
+        )}
+      </div>
+  
+      <UserInfo />
+    </>
   );
+  
 }

@@ -8,6 +8,9 @@ import ChatWithAgent from "./pages/ChatWithAgent";
 import BookLesson from "./pages/BookLesson";
 import Navbar from "./components/Navbar";
 import ManageMyLessons from "./pages/ManageMyLessons";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import EditProfile from "./pages/EditProfile";
 
 
 export default function App() {
@@ -22,6 +25,9 @@ export default function App() {
         <Route path="/dashboard" element={<UserDashboard />} />
         <Route path="/chat" element={<ChatWithAgent />} /> 
         <Route path="/my-lessons" element={<ManageMyLessons />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/profile/edit" element={<EditProfile />} />
       </Routes>
     </div>
   );

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../styles/login.css"; // ✅ import your CSS
 
 export default function LogIn() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -36,9 +37,9 @@ export default function LogIn() {
   };
 
   return (
-    <div>
+    <div className="login-container">
       <h2>Sign In</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="login-form">
         <input
           type="email"
           name="email"
@@ -46,7 +47,7 @@ export default function LogIn() {
           value={formData.email}
           onChange={handleChange}
           required
-        /><br />
+        />
         <input
           type="password"
           name="password"
@@ -54,7 +55,7 @@ export default function LogIn() {
           value={formData.password}
           onChange={handleChange}
           required
-        /><br />
+        />
         <button type="submit">Sign In</button>
       </form>
     </div>

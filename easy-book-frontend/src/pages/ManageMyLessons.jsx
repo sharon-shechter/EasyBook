@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import UserInfo from "../components/UserInfo";
-import "../styles/manageLessons.css";
+import "../styles/manageMyLessons.css";
 
 export default function ManageMyLessons() {
   const [lessons, setLessons] = useState([]);

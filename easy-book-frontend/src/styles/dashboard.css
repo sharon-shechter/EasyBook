@@ -1,0 +1,52 @@
+.manage-buttons {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+.manage-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center;     
+  min-height: 50vh;       
+  padding: 40px;
+  background-color: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+}
+
+.manage-buttons button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f4f7fb;
+  color: #333;
+  border: 2px solid #0077ff;
+  padding: 24px;
+  width: 200px;
+  height: 140px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.manage-buttons button:hover {
+  background-color: #0077ff;
+  color: white;
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.manage-buttons button::before {
+  content: attr(data-icon);
+  font-size: 32px;
+  margin-bottom: 12px;
+  display: block;
+}

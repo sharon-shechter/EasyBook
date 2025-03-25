@@ -59,17 +59,15 @@ def get_all_user_lessons(db: Session, user_id: int):
     """
     Fetch all lessons for a specific user with user details.
     """
-    try:
-        lessons = (
-            db.query(Lesson)
-            .filter(Lesson.user_id == user_id)
-            .all()
-        )
 
-        if not lessons:
-            raise HTTPException(status_code=404 , detail = "No lessons found for this user")
-        return lessons
+    lessons = (
+        db.query(Lesson)
+        .filter(Lesson.user_id == user_id)
+        .all()
+    )
 
-    except Exception as e:
-        raise Exception(f"Error fetching user lessons: {str(e)}")
-    
+    if not lessons:
+        raise HTTPException(status_code=404 , detail = "No lessons found for this user")
+    return lessons
+
+

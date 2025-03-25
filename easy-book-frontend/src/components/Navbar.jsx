@@ -4,10 +4,10 @@ import "../styles/navbar.css";
 export default function Navbar() {
   return (
     <nav className="navbar">
-      <h1 className="logo">Easy Book</h1>
+      <Link to="/" className="logo">Easy Book</Link> 
       <div className="nav-links">
-        <Link to="/login">Log in</Link>
-        <Link to="/signup">Sign Up</Link>
+        <Link to="/about">About</Link> 
+        <Link to="/contact">Contact Us</Link> 
       </div>
     </nav>
   );

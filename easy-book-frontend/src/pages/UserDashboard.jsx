@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"; 
-import "../styles/manageLessons.css";
+import "../styles/dashboard.css";
 import UserInfo from "../components/UserInfo"; 
 
 export default function UserDashboard() {
