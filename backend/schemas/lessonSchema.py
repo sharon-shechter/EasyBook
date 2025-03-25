@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import time, date, datetime
+from typing import Optional
 
 # Lesson Create Schema
 class LessonCreate(BaseModel):
@@ -8,8 +9,8 @@ class LessonCreate(BaseModel):
     end_time: time
     duration: int  
     lesson_type: str
-    lesson_adress: str
     lesson_name: str
+    lesson_adress: Optional[str] = None   
     class_number: int
 
 
@@ -17,11 +18,11 @@ class LessonCreate(BaseModel):
 class LessonResponse(BaseModel):
     lesson_id: int  
     user_id: int
-    google_event_id : str
+    google_event_id: str
     date: date  
     start_time: time
     end_time: time
-    lesson_type : str
+    lesson_type: str
     lesson_adress: str
     status: int
     lesson_name: str
@@ -29,5 +30,6 @@ class LessonResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-class Config:
-    from_attributes = True
+    class Config:
+        from_attributes = True
+

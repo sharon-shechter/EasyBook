@@ -39,12 +39,16 @@ def print_local_storage():
 def chatbot_conversation(db: Session, user_id: int, user_input: str):
     # Retrieve conversation history or start a new one
     if user_id not in local_storage:
-        local_storage[user_id] = {"messages": [], "timestamp": time.time()}
+        local_storage[user_id] = {
+    "messages": [],
+    "timestamp": time.time(),
+   
+}
 
     local_storage[user_id]["timestamp"] = time.time()  # Update last interaction time
     conversation_history = local_storage[user_id]["messages"]
     if not any(msg["role"] == "system" for msg in conversation_history):
-        conversation_history.insert(0, {"role": "system", "content": f'You are a helpful assistant guiding a user to manage their lessons. To day is {str(TODAY)}.'})
+        conversation_history.insert(0, {"role": "system", "content": f'You are a helpful assistant guiding a user to manage their lessons. To day is {str(TODAY)}. Talk shortly and simply"'})
 
     # Add user input to conversation history
     conversation_history.append({"role": "user", "content": user_input})
@@ -98,10 +102,16 @@ def chatbot_conversation(db: Session, user_id: int, user_input: str):
                     result = possible_time_slots_tool(lesson_date, lesson_address, lesson_duration, user_id)
                     assistant_reply = f"Possible time slots: {result}" if result else "No available time slots found."
 
-                elif function_name == "user_signup_tool":
-                    user_data = UserCreate(**function_args)
-                    result = user_signup_tool(user_data, db)
-                    assistant_reply = result if result else "User signup failed."
+                elif function_name == "get_lessons_tool":
+                    result = get_lessons_tool(db, user_id)
+                    if result:
+                        lesson_lines = [
+                            f"• {lesson['lesson_name'].capitalize()} on {lesson['date']} from {lesson['start_time']} to {lesson['end_time']} at {lesson['lesson_adress']}"
+                            for lesson in result
+                        ]
+                        assistant_reply = "Your lessons:\n" + "\n".join(lesson_lines)
+                    else:
+                        assistant_reply = "No lessons found."
 
                 
 

@@ -1,7 +1,6 @@
 import { useState } from "react";
-import "../styles/chat.css"; 
+import "../styles/chat.css";
 import UserInfo from "../components/UserInfo";
-
 
 export default function ChatWithAgent() {
   const [messages, setMessages] = useState([]);
@@ -11,24 +10,33 @@ export default function ChatWithAgent() {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const user_id = localStorage.getItem("userId");
-    const newMessage = { role: "user", content: input };
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("You're not logged in. Please log in again.");
+      return;
+    }
 
+    const newMessage = { role: "user", content: input };
     setMessages((prev) => [...prev, newMessage]);
     setInput("");
 
     try {
       const response = await fetch("http://127.0.0.1:8000/agent/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
-          user_id: user_id,
           content: input,
         }),
       });
 
+      if (!response.ok) throw new Error("Failed to get agent response");
+
       const data = await response.json();
       const reply = data.response;
+
       setMessages((prev) => [...prev, { role: "agent", content: reply }]);
     } catch (err) {
       console.error("Chat error:", err);
@@ -63,7 +71,7 @@ export default function ChatWithAgent() {
           <button type="submit">Send</button>
         </form>
       </div>
-  
+
       <UserInfo />
     </>
   );

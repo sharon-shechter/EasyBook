@@ -4,6 +4,8 @@ from dateutil.parser import parse
 from backend.services.Google_apiService import calculate_departure_time, calculate_travel_time, is_time_slot_available, add_lesson_to_calendar, delete_event_from_calendar
 from backend.repositories.lessonRepositorie import create_lesson , delete_lesson_from_db , get_lessons_by_lesson_id
 from fastapi import HTTPException
+from googleapiclient.errors import HttpError
+
 import pytz
 
 EXTRA_TIME = 30
@@ -12,23 +14,32 @@ def create_lesson_service(db: Session, lesson_data, user_id: int, status: int, g
     """Handles business logic for lesson creation."""
     google_event_id = add_lesson_to_calendar(google_service, db ,  lesson_data, user_id)
     new_lesson  = create_lesson(db, lesson_data, user_id, google_event_id, status)
-    print ("db_lesson", new_lesson)
     return new_lesson
 
 
 
-def delete_lesson_service( lesson_id: int, user_id : int,  google_service , db: Session,):
-    """Handles deleting a lesson and its Google Calendar event."""
-    print ("start delete_lesson_service")
+def delete_lesson_service(lesson_id: int, user_id: int, google_service, db: Session):
+    print("start delete_lesson_service")
     try:
         lesson = get_lessons_by_lesson_id(db, lesson_id)
         event_id = lesson.google_event_id
+
         if not event_id:
             raise HTTPException(status_code=404, detail="Lesson does not have a Google Calendar event")
-        delete_event_from_calendar(google_service, lesson.google_event_id)
+
+        delete_event_from_calendar(google_service, event_id)
         delete_lesson_from_db(db, lesson_id)
+
+    except HTTPException as http_exc:
+        raise http_exc  # Re-raise FastAPI exceptions directly
+
+    except HttpError as http_error:
+        if http_error.status_code == 410:
+            raise HTTPException(status_code=404, detail="Google Calendar event already deleted.")
+        raise HTTPException(status_code=500, detail=f"Google Calendar error: {http_error}")
+
     except Exception as e:
-        raise HTTPException({e})
+        raise HTTPException(status_code=500, detail=f"Unexpected error while deleting lesson: {e}")
 
     return True
     

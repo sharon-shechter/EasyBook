@@ -4,12 +4,55 @@ import json
 
 def get_tools():
     return (
-        {
+         {
             "type": "function",
             "function": {
                 "name": "create_lesson_tool",
                 "description": "Creates a new lesson given the required details.",
-                "parameters": json.loads(LessonCreate.schema_json())  
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "date": {
+                            "type": "string",
+                            "format": "date",
+                            "description": "The date of the lesson in YYYY-MM-DD format"
+                        },
+                        "start_time": {
+                            "type": "string",
+                            "format": "time",
+                            "description": "The start time of the lesson in HH:MM format"
+                        },
+                        "end_time": {
+                            "type": "string",
+                            "format": "time",
+                            "description": "The end time of the lesson in HH:MM format"
+                        },
+                        "duration": {
+                            "type": "integer",
+                            "description": "Duration of the lesson in minutes"
+                        },
+                        "lesson_type": {
+                            "type": "string",
+                            "description": "Home or Zoom"
+                        },
+                        "lesson_adress": {
+                            "type": "string",
+                            "description": "Address where the lesson will take place - if applicable"
+                        },
+                        "lesson_name": {
+                            "type": "string",
+                            "description": "Name or title of the lesson like math or algebra"
+                        },
+                        "class_number": {
+                            "type": "integer",
+                            "description": "Class number or grade of the student"
+                        }
+                    },
+                    "required": [
+                        "date", "start_time", "end_time", "duration",
+                        "lesson_type", "lesson_name", "class_number"
+                    ]
+                }
             }
         },
         {

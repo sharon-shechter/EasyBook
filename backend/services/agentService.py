@@ -5,7 +5,7 @@ from backend.services.lessonService import get_possible_time_slots, generate_ful
 from backend.services.Google_apiService import authenticate_google_calendar , get_events_of_date
 from backend.repositories.lessonRepositorie import get_all_user_lessons
 from backend.schemas.lessonSchema import LessonCreate
-from backend.database.database import get_db
+from backend.schemas.lessonSchema import LessonResponse
 from backend.services.userService import signup_user_service
 from backend.schemas.userSchema import UserCreate
 
@@ -32,12 +32,13 @@ def delete_lesson_tool(lesson_id: int, db: Session, user_id: int):
 
 
 # Tool function for fetching all lessons
-def get_lessons_tool(db: Session, user_id: int ):
+def get_lessons_tool(db: Session, user_id: int):
     try:
         lessons = get_all_user_lessons(db, user_id)
-        return lessons
+        return [LessonResponse.from_orm(lesson).dict() for lesson in lessons]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch lessons - {e}")
+
 
 def possible_time_slots_tool(lesson_date: str , lesson_address: str, lesson_duration: int, user_id: int):
     """Find possible time slots for a lesson in a readable format."""
