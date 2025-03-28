@@ -1,6 +1,8 @@
 import { useState } from "react";
 import "../styles/bookLesson.css";
 import UserInfo from "../components/UserInfo";
+const apiUrl = import.meta.env.VITE_API_URL;
+
 
 
 export default function BookLesson() {
@@ -39,7 +41,7 @@ export default function BookLesson() {
         lesson_duration: Number(formData.lesson_duration),
       };
 
-      const response = await fetch("http://127.0.0.1:8000/lessons/possible_slots", {
+      const response = await fetch(`${apiUrl}/lessons/possible_slots`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,7 +79,7 @@ export default function BookLesson() {
     };
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/lessons/create", {
+      const response = await fetch(`${apiUrl}/lessons/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

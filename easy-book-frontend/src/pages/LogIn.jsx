@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/login.css"; // ✅ import your CSS
+import "../styles/login.css"; 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 
 export default function LogIn() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -13,15 +15,24 @@ export default function LogIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://127.0.0.1:8000/users/login", {
+      const response = await fetch(`${apiUrl}/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || "Login failed");
+        const text = await response.text();
+        let errorMessage = "Login failed";
+      
+        try {
+          const json = JSON.parse(text);
+          errorMessage = json.detail || errorMessage;
+        } catch {
+          errorMessage = text || errorMessage;
+        }
+      
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();

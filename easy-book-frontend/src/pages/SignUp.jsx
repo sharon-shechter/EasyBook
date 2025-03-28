@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/signup.css"; // ✅ Add this
+import "../styles/signup.css"; 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -21,7 +23,7 @@ export default function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://127.0.0.1:8000/users/signup", {
+      const response = await fetch(`${apiUrl}/users/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

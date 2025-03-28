@@ -5,11 +5,12 @@ import "../styles/manageMyLessons.css";
 export default function ManageMyLessons() {
   const [lessons, setLessons] = useState([]);
   const token = localStorage.getItem("token");
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchLessons = async () => {
       try {
-        const res = await fetch("http://127.0.0.1:8000/lessons/get_lessons", {
+        const res = await fetch(`${apiUrl}/lessons/get_lessons`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -22,15 +23,15 @@ export default function ManageMyLessons() {
       }
     };
 
-    fetchLessons(); 
-  }, [token]); 
+    fetchLessons();
+}, [token, apiUrl]); 
 
   const handleDelete = async (lesson_id) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this lesson?");
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`http://127.0.0.1:8000/lessons/delete/${lesson_id}`, {
+      const res = await fetch(`${apiUrl}/lessons/delete/${lesson_id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

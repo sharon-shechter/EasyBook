@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import UserInfo from "../components/UserInfo";
 import "../styles/editProfile.css";
+const apiUrl = import.meta.env.VITE_API_URL;
+
 
 export default function EditProfile() {
   const [userId, setUserId] = useState(0);
@@ -13,7 +15,7 @@ export default function EditProfile() {
   useEffect(() => {
     const fetchUserId = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/users/get_user/${email}`, {
+        const response = await fetch(`${apiUrl}/users/get_user/${email}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

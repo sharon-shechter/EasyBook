@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import '../styles/userInfo.css';
+const apiUrl = import.meta.env.VITE_API_URL;
+
 
 export default function UserInfo() {
   const [userData, setUserData] = useState(null);
@@ -13,7 +15,7 @@ export default function UserInfo() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/users/get_user/${email}`, {
+        const response = await fetch(`${apiUrl}/users/get_user/${email}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "../styles/chat.css";
 import UserInfo from "../components/UserInfo";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 export default function ChatWithAgent() {
   const [messages, setMessages] = useState([]);
@@ -21,7 +22,7 @@ export default function ChatWithAgent() {
     setInput("");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/agent/chat", {
+      const response = await fetch(`${apiUrl}/agent/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
