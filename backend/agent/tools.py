@@ -1,7 +1,3 @@
-from backend.schemas.lessonSchema import LessonCreate
-from backend.schemas.userSchema import UserCreate, LoginRequest
-import json
-
 def get_tools():
     return (
          {

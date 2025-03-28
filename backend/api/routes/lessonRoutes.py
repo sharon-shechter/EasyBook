@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from datetime import date
 from fastapi import Body
 from sqlalchemy.orm import Session
-from backend.models.lessonModel import Lesson
 from backend.database.database import get_db
 from backend.schemas.lessonSchema import LessonCreate, LessonResponse
 from backend.utilities.token import get_current_user

@@ -1,6 +1,6 @@
 import threading
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware  # ✅ ADD THIS
+from fastapi.middleware.cors import CORSMiddleware  
 from backend.database.database import engine, Base
 from backend.api.routes import userRoutes, lessonRoutes, agentRoutes
 from backend.agent.chat_agent import cleanup_old_sessions  # Import cleanup function

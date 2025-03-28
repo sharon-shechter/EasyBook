@@ -19,7 +19,6 @@ def create_lesson_service(db: Session, lesson_data, user_id: int, status: int, g
 
 
 def delete_lesson_service(lesson_id: int, user_id: int, google_service, db: Session):
-    print("start delete_lesson_service")
     try:
         lesson = get_lessons_by_lesson_id(db, lesson_id)
         event_id = lesson.google_event_id

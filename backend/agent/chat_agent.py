@@ -2,9 +2,7 @@ import openai
 import os
 import json
 import time
-import threading
 from datetime import date
-from fastapi import HTTPException
 from backend.schemas.userSchema import UserCreate
 from backend.services.agentService import user_signup_tool
 from sqlalchemy.orm import Session
@@ -48,7 +46,7 @@ def chatbot_conversation(db: Session, user_id: int, user_input: str):
     local_storage[user_id]["timestamp"] = time.time()  # Update last interaction time
     conversation_history = local_storage[user_id]["messages"]
     if not any(msg["role"] == "system" for msg in conversation_history):
-        conversation_history.insert(0, {"role": "system", "content": f'You are a helpful assistant guiding a user to manage their lessons. To day is {str(TODAY)}. Talk shortly and simply"'})
+        conversation_history.insert(0, {"role": "system", "content": f'You are a helpful assistant guiding a user to manage their lessons for the privet teacher - Sharon (male)  . To day is {str(TODAY)}. Talk shortly and simply"'})
 
     # Add user input to conversation history
     conversation_history.append({"role": "user", "content": user_input})
@@ -106,7 +104,7 @@ def chatbot_conversation(db: Session, user_id: int, user_input: str):
                     result = get_lessons_tool(db, user_id)
                     if result:
                         lesson_lines = [
-                            f"• {lesson['lesson_name'].capitalize()} on {lesson['date']} from {lesson['start_time']} to {lesson['end_time']} at {lesson['lesson_adress']}"
+                            f"• {lesson['lesson_name'].capitalize()} on {lesson['date']} from {lesson['start_time']} to {lesson['end_time']} at {lesson['lesson_adress']} "  
                             for lesson in result
                         ]
                         assistant_reply = "Your lessons:\n" + "\n".join(lesson_lines)

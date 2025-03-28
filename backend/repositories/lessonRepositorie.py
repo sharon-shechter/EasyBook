@@ -2,7 +2,6 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session 
 from backend.models.lessonModel import Lesson
 from backend.schemas.lessonSchema import LessonCreate
-from backend.services.Google_apiService import add_lesson_to_calendar 
 
 
 def create_lesson(db: Session, lesson_data: LessonCreate, user_id: int ,google_event_id : int , status : int , ): 
