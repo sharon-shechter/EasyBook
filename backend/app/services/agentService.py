@@ -1,13 +1,13 @@
 from fastapi import HTTPException
 from datetime import date
 from sqlalchemy.orm import Session
-from backend.services.lessonService import get_possible_time_slots, generate_full_day_slots , create_lesson_service, delete_lesson_service
-from backend.services.Google_apiService import authenticate_google_calendar , get_events_of_date
-from backend.repositories.lessonRepositorie import get_all_user_lessons
-from backend.schemas.lessonSchema import LessonCreate
-from backend.schemas.lessonSchema import LessonResponse
-from backend.services.userService import signup_user_service
-from backend.schemas.userSchema import UserCreate
+from app.services.lessonService import get_possible_time_slots, generate_full_day_slots , create_lesson_service, delete_lesson_service
+from app.services.Google_apiService import authenticate_google_calendar , get_events_of_date
+from app.repositories.lessonRepositorie import get_all_user_lessons
+from app.schemas.lessonSchema import LessonCreate
+from app.schemas.lessonSchema import LessonResponse
+from app.services.userService import signup_user_service
+from app.schemas.userSchema import UserCreate
 
 
 

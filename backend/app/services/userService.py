@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from backend.models.userModel import User
-from backend.repositories.userRepositorie import get_user_by_email, create_user, get_user_by_id , verigy_existing_user
-from backend.utilities.hash import hash_password, verify_password
-from backend.utilities.token import create_access_token
-from backend.schemas.userSchema import UserCreate
+from app.models.userModel import User
+from app.repositories.userRepositorie import get_user_by_email, create_user, get_user_by_id , verigy_existing_user
+from app.utilities.hash import hash_password, verify_password
+from app.utilities.token import create_access_token
+from app.schemas.userSchema import UserCreate
 
 def signup_user_service(db: Session, user: UserCreate):
     """Handles user signup with email validation and password hashing."""

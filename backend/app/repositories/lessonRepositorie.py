@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session 
-from backend.models.lessonModel import Lesson
-from backend.schemas.lessonSchema import LessonCreate
+from app.models.lessonModel import Lesson
+from app.schemas.lessonSchema import LessonCreate
 
 
 def create_lesson(db: Session, lesson_data: LessonCreate, user_id: int ,google_event_id : int , status : int , ): 

@@ -3,12 +3,12 @@ import os
 import json
 import time
 from datetime import date
-from backend.schemas.userSchema import UserCreate
-from backend.services.agentService import user_signup_tool
+from app.schemas.userSchema import UserCreate
+from app.services.agentService import user_signup_tool
 from sqlalchemy.orm import Session
-from backend.agent.tools import get_tools
-from backend.schemas.lessonSchema import LessonCreate
-from backend.services.agentService import create_lesson_tool, delete_lesson_tool, get_lessons_tool,possible_time_slots_tool 
+from app.agent.tools import get_tools
+from app.schemas.lessonSchema import LessonCreate
+from app.services.agentService import create_lesson_tool, delete_lesson_tool, get_lessons_tool,possible_time_slots_tool 
 
 EXPIRATION_TIME = 300
 

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.orm import Session
-from backend.database.database import get_db
-from backend.agent.chat_agent import chatbot_conversation
-from backend.utilities.token import get_current_user
+from app.database.database import get_db
+from app.agent.chat_agent import chatbot_conversation
+from app.utilities.token import get_current_user
 
 router = APIRouter()
 

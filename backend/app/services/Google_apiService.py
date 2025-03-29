@@ -9,8 +9,8 @@ from datetime import time
 from fastapi import HTTPException
 import googlemaps
 import pytz
-from backend.schemas.lessonSchema import LessonCreate
-from backend.services.userService import get_user_full_name
+from app.schemas.lessonSchema import LessonCreate
+from app.services.userService import get_user_full_name
 from config import token, credentials, Google_API_KEY
 
 

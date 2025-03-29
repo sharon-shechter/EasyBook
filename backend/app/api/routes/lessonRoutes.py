@@ -2,12 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from datetime import date
 from fastapi import Body
 from sqlalchemy.orm import Session
-from backend.database.database import get_db
-from backend.schemas.lessonSchema import LessonCreate, LessonResponse
-from backend.utilities.token import get_current_user
-from backend.repositories.lessonRepositorie import get_all_user_lessons
-from backend.services.Google_apiService import authenticate_google_calendar , get_events_of_date  
-from backend.services.lessonService import create_lesson_service, get_possible_time_slots , generate_full_day_slots ,delete_lesson_service
+from app.database.database import get_db
+from app.schemas.lessonSchema import LessonCreate, LessonResponse
+from app.utilities.token import get_current_user
+from app.repositories.lessonRepositorie import get_all_user_lessons
+from app.services.Google_apiService import authenticate_google_calendar , get_events_of_date  
+from app.services.lessonService import create_lesson_service, get_possible_time_slots , generate_full_day_slots ,delete_lesson_service
 
 router = APIRouter()
 

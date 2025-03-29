@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session 
 from datetime import datetime, timedelta , time
 from dateutil.parser import parse
-from backend.services.Google_apiService import calculate_departure_time, calculate_travel_time, is_time_slot_available, add_lesson_to_calendar, delete_event_from_calendar
-from backend.repositories.lessonRepositorie import create_lesson , delete_lesson_from_db , get_lessons_by_lesson_id
+from app.services.Google_apiService import calculate_departure_time, calculate_travel_time, is_time_slot_available, add_lesson_to_calendar, delete_event_from_calendar
+from app.repositories.lessonRepositorie import create_lesson , delete_lesson_from_db , get_lessons_by_lesson_id
 from fastapi import HTTPException
 from googleapiclient.errors import HttpError
 

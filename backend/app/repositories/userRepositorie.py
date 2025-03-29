@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from backend.models.userModel import User
+from app.models.userModel import User
 
 def create_user(db: Session, user_data):
     """Create a new user and store hashed password."""
